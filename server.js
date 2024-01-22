@@ -1140,7 +1140,6 @@ app.get('/api/employees', (req, res) => {
 
 app.post('/api/create_employees', (req, res) => {
   const newEmployee = req.body;
-  newEmployee.id = employees.length + 1;
   employees.push(newEmployee);
   res.json(newEmployee);
   console.log("Request data:");
