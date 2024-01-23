@@ -65,6 +65,21 @@ app.get('/employees/search', (req, res) => {
   });
 });
 
+app.get('/employees/:id', (req, res) => {
+  const employeeId = req.params.id;
+  db.query('SELECT * FROM employee WHERE id = ?', [employeeId], (err, result) => {
+    if (err) {
+      res.status(500).json({ message: err.message });
+    } else {
+      if (result.length === 0) {
+        res.status(404).json({ message: 'Employee not found' });
+      } else {
+        res.json(result[0]);
+      }
+    }
+  });
+});
+
 app.get('/employees/limit', (req, res) => {
   const { limit } = req.query;
 
