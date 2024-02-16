@@ -65,6 +65,29 @@ app.get('/employees/search', (req, res) => {
   });
 });
 
+app.get('/employees/searchsalary', (req, res) => {
+  const { keyword, salary1, salary2 } = req.query;
+
+  const sqlQuery = `
+    SELECT * FROM employee
+    WHERE firstName LIKE ? AND basicSalary BETWEEN ? AND ?
+  `;
+
+  const searchKeyword = `%${keyword}%`;
+  const searchSalary1 = salary1;
+  const searchSalary2 = salary2;
+
+  console.log(sqlQuery);
+
+  db.query(sqlQuery, [searchKeyword, searchSalary1, searchSalary2], (err, results) => {
+    if (err) {
+      res.status(500).json({ message: err.message });
+    } else {
+      res.json(results);
+    }
+  });
+});
+
 app.get('/employees/:id', (req, res) => {
   const employeeId = req.params.id;
   db.query('SELECT * FROM employee WHERE id = ?', [employeeId], (err, result) => {
@@ -111,6 +134,37 @@ app.post('/employees', (req, res) => {
       console.error(err.message);
     } else {
       res.status(201).json({ id: userName, firstName, lastName, email, birthDate, basicSalary, marital_status, emp_group, description });
+    }
+  });
+});
+
+app.put('/employees/:id', (req, res) => {
+  const employeeId = req.params.id;
+  const { userName, firstName, lastName, email, birthDate, basicSalary, marital_status, emp_group, description } = req.body;
+
+  const sqlQuery = 'UPDATE employee SET userName=?, firstName=?, lastName=?, email=?, birthDate=?, basicSalary=?, marital_status=?, emp_group=?, description=? WHERE id=?';
+
+  db.query(sqlQuery, [userName, firstName, lastName, email, birthDate, basicSalary, marital_status, emp_group, description, employeeId], (err, result) => {
+    if (err) {
+      res.status(400).json({ message: err.message });
+      console.error(err.message);
+    } else {
+      res.status(200).json({ id: employeeId, userName, firstName, lastName, email, birthDate, basicSalary, marital_status, emp_group, description });
+    }
+  });
+});
+
+app.delete('/employees/:id', (req, res) => {
+  const employeeId = req.params.id;
+
+  const sqlQuery = 'DELETE FROM employee WHERE id=?';
+
+  db.query(sqlQuery, [employeeId], (err, result) => {
+    if (err) {
+      res.status(400).json({ message: err.message });
+      console.error(err.message);
+    } else {
+      res.status(200).json({ message: 'Employee deleted successfully', id: employeeId });
     }
   });
 });
